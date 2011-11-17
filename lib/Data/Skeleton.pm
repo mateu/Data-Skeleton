@@ -1,8 +1,58 @@
+use strictures 1;
 package Data::Skeleton;
 use Moo;
 use MooX::Types::MooseLike qw/Str/;
 use Scalar::Util qw(blessed);
 use Data::Dumper::Concise;
+
+=head1 NAME
+
+Data::Skeleton - Show the keys of a deep data structure
+
+=head1 SYNOPSIS
+
+    use Data::Skeleton;
+    my $ds = Data::Skeleton->new;
+    my $deep_data_structure = {
+        id            => 'blahblahblah',
+        last_modified => 1,
+        sections      => [
+            {
+                content => 'h1. Ice Cream',
+                class   => 'textile'
+            },
+            {
+                content => '# Chocolate',
+                class   => 'markdown'
+            },
+        ],
+    };
+    use Data::Dumper::Concise;
+    print Dumper $ds->deflesh($deep_data_structure);
+
+# results in:
+
+    {
+      id => "",
+      last_modified => "",
+      sections => [
+        {
+          class => "",
+          content => ""
+        },
+        {
+          class => "",
+          content => ""
+        }
+      ]
+    }
+
+=head1 DESCRIPTION
+
+Sometimes you just want to see the "schema" of a data structure.
+This modules shows only the keys with blanks for the values.
+
+=cut
 
 has 'value_marker' => (
     is => 'ro',
@@ -11,15 +61,24 @@ has 'value_marker' => (
     default => sub { '' },
 );
 
+=head1 METHODS
+
+=head2 deflesh
+
+    Signature: (HashRef|ArrayRef)
+      Returns: The data structure with values blanked
+
+=cut
+
 sub deflesh {
     my ($self, $data) = @_;
     if (ref($data) eq 'HASH') {
         return $self->_blank_hash($data);
-    }
-    elsif (ref($data) eq 'ARRAY') {
+    } elsif (ref($data) eq 'ARRAY') {
         return $self->_blank_array($data);
-    }
-    else {
+    } elsif (blessed($data) && eval { keys %{$data}; 1; } ) {
+        return $self->_blank_hash($data);
+    } else {
         die "You need to pass the deflesh method either a hash or an array reference";
     }
 }
@@ -97,6 +156,20 @@ sub _blank_array {
     return $arrayref;
 }
 
-#say Dumper dump_partial($page, {max_total_len => 1000, max_len => 0});
-
 1;
+
+=head1 SEE ALSO
+
+L<Data::Dump::Partial> is way more feature rich than this module.  
+The only reason I didn't use it is that the output is all on one line.  
+To get something similar to deflesh with Data::Dump::Partial do:
+
+    say Dumper dump_partial($data, {max_total_len => $big_enough_number, max_len => 0});
+    
+The important part being max_len = 0
+
+This module was inspired when I wanted to see the "schema" of a MongoDB document.
+If you want to enforce a schema (and have a place to recall its nature)
+then you might consider L<Data::Schema>
+
+=cut
