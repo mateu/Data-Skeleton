@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.02      2012-05-02 14:50:01 America/Denver
           - Migrate from MooX::Types::MooseLike
           to MooX::Types::MooseLike::Base
 
