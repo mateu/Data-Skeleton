@@ -1,3 +1,6 @@
 {{$NEXT}}
+          - Migrate from MooX::Types::MooseLike
+          to MooX::Types::MooseLike::Base
 
 0.01      2011-11-17 15:11:59 America/Denver
+          - Initial Release

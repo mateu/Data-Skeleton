@@ -1,7 +1,7 @@
 use strictures 1;
 package Data::Skeleton;
 use Moo;
-use MooX::Types::MooseLike qw/Str/;
+use MooX::Types::MooseLike::Base qw/Str/;
 use Scalar::Util qw(blessed);
 use Data::Dumper::Concise;
 
@@ -160,16 +160,28 @@ sub _blank_array {
 
 =head1 SEE ALSO
 
-L<Data::Dump::Partial> is way more feature rich than this module.  
-The only reason I didn't use it is that the output is all on one line.  
+Data::Dump::Partial is way more feature rich than this module.
+The only reason I didn't use it is that the output is all on one line.
 To get something similar to deflesh with Data::Dump::Partial do:
 
     say Dumper dump_partial($data, {max_total_len => $big_enough_number, max_len => 0});
-    
+
 The important part being max_len = 0
 
 This module was inspired when I wanted to see the "schema" of a MongoDB document.
 If you want to enforce a schema (and have a place to recall its nature)
 then you might consider L<Data::Schema>
+
+=head1 AUTHORS
+
+Mateu Hunter C<hunter@missoula.org>
+
+=head1 COPYRIGHT
+
+Copyright 2011-2012, Mateu Hunter
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
 
 =cut
