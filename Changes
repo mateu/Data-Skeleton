@@ -1,4 +1,6 @@
 {{$NEXT}}
+
+0.03      2012-07-07 12:18:08 America/Denver
          - Handle circular references to avoid deep recursion
            [RT#78222] (garu)
 
