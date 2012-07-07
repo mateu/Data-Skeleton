@@ -1,5 +1,4 @@
 use strictures 1;
-use diagnostics;
 package Data::Skeleton;
 use Moo;
 use MooX::Types::MooseLike::Base qw/Str HashRef Bool/;
