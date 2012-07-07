@@ -100,7 +100,7 @@ sub _blank_hash {
 
     foreach my $key (keys %{$hashref}) {
         my $value = $hashref->{$key};
-        my $ref_value = ref($value); 
+        my $ref_value = ref($value);
         my $references_seen = $self->references_seen;
         # Skip if we've seen this ref before
         if ($ref_value and $references_seen->{$value}) {
@@ -153,7 +153,7 @@ sub _blank_hash {
 sub _blank_array {
     my ($self, $arrayref) = @_;
 
-    my $references_seen = $self->references_seen;    
+    my $references_seen = $self->references_seen;
     my @ref_values =
       grep { ref($_) eq 'HASH' or ref($_) eq 'ARRAY' } @{$arrayref};
     # if no array values are a reference to either a Hash or an Array then we nuke the entire array
