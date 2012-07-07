@@ -65,7 +65,14 @@ has 'references_seen' => (
     is => 'rw',
     isa => HashRef,
 );
-has 'debug' => (
+
+=head2 debug_skeleton
+
+Turn on/off debugging
+
+=cut
+
+has 'debug_skeleton' => (
     is => 'ro',
     isa => Bool,
 );
@@ -104,7 +111,7 @@ sub _blank_hash {
         my $references_seen = $self->references_seen;
         # Skip if we've seen this ref before
         if ($ref_value and $references_seen->{$value}) {
-            warn "Seen referenced value: $value before" if $self->debug;
+            warn "Seen referenced value: $value before" if $self->debug_skeleton;
             next;
         }
         # If we have a reference value then note it to avoid deep recursion
@@ -169,7 +176,7 @@ sub _blank_array {
                 elsif (ref($_) eq 'ARRAY') {
                     # Skip if we've seen this ref before
                     if ($references_seen->{$_}) {
-                        warn "Seen referenced value: $_ before" if $self->debug;
+                        warn "Seen referenced value: $_ before" if $self->debug_skeleton;
                         return $_;
                     }
                     $references_seen->{$_} = 1;
