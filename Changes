@@ -1,4 +1,6 @@
 {{$NEXT}}
+         - Handle circular references to avoid deep recursion
+           [RT#78222] (garu)
 
 0.02      2012-05-02 14:50:01 America/Denver
           - Migrate from MooX::Types::MooseLike

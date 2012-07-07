@@ -1,7 +1,8 @@
 use strictures 1;
+use diagnostics;
 package Data::Skeleton;
 use Moo;
-use MooX::Types::MooseLike::Base qw/Str/;
+use MooX::Types::MooseLike::Base qw/Str HashRef Bool/;
 use Scalar::Util qw(blessed);
 use Data::Dumper::Concise;
 
@@ -14,7 +15,7 @@ Data::Skeleton - Show the keys of a deep data structure
     use Data::Skeleton;
     my $ds = Data::Skeleton->new;
     my $deep_data_structure = {
-        id            => 'blahblahblah',
+        id            => 'hablando',
         last_modified => 1,
         sections      => [
             {
@@ -60,6 +61,14 @@ has 'value_marker' => (
     lazy => 1,
     default => sub { '' },
 );
+has 'references_seen' => (
+    is => 'rw',
+    isa => HashRef,
+);
+has 'debug' => (
+    is => 'ro',
+    isa => Bool,
+);
 
 =head1 METHODS
 
@@ -91,21 +100,33 @@ sub _blank_hash {
 
     foreach my $key (keys %{$hashref}) {
         my $value = $hashref->{$key};
-        if (!ref($value)) {
+        my $ref_value = ref($value); 
+        my $references_seen = $self->references_seen;
+        # Skip if we've seen this ref before
+        if ($ref_value and $references_seen->{$value}) {
+            warn "Seen referenced value: $value before" if $self->debug;
+            next;
+        }
+        # If we have a reference value then note it to avoid deep recursion
+        # with circular references.
+        if ($ref_value) {
+            $references_seen->{$value} = 1;
+            $self->references_seen($references_seen);
+        }
+        if (!$ref_value) {
             # blank a value that is not a reference
             $hashref->{$key} = $self->value_marker;
         }
-        elsif (ref($value) eq 'SCALAR') {
+        elsif ($ref_value eq 'SCALAR') {
             $hashref->{$key} = $self->value_marker;
         }
-        elsif (ref($value) eq 'HASH') {
-
+        elsif ($ref_value eq 'HASH') {
             # recurse when a value is a HashRef
             $hashref->{$key} = $self->_blank_hash($value);
         }
 
         # look inside ArrayRefs for HashRefs
-        elsif (ref($value) eq 'ARRAY') {
+        elsif ($ref_value eq 'ARRAY') {
             $hashref->{$key} = $self->_blank_array($value);
         }
         else {
@@ -115,10 +136,10 @@ sub _blank_hash {
                     my $blanked_hash_object = $self->_blank_hash($value); #[keys %{$value}];
                     # Note that we have an object
                     # WARNING: we are altering the data structure by adding a key
-                    $blanked_hash_object->{BLESSED_AS} = ref($value);
+                    $blanked_hash_object->{BLESSED_AS} = $ref_value;
                     $hashref->{$key} = $blanked_hash_object;
                 } else {
-                    $hashref->{$key} = ref($value) . ' object';
+                    $hashref->{$key} = $ref_value . ' object';
                 }
             }
             else {
@@ -132,6 +153,7 @@ sub _blank_hash {
 sub _blank_array {
     my ($self, $arrayref) = @_;
 
+    my $references_seen = $self->references_seen;    
     my @ref_values =
       grep { ref($_) eq 'HASH' or ref($_) eq 'ARRAY' } @{$arrayref};
     # if no array values are a reference to either a Hash or an Array then we nuke the entire array
@@ -145,6 +167,13 @@ sub _blank_array {
                     $self->_blank_hash($_);
                 }
                 elsif (ref($_) eq 'ARRAY') {
+                    # Skip if we've seen this ref before
+                    if ($references_seen->{$_}) {
+                        warn "Seen referenced value: $_ before" if $self->debug;
+                        return $_;
+                    }
+                    $references_seen->{$_} = 1;
+                    $self->references_seen($references_seen);
                     $self->_blank_array($_);
                 }
                 else {
