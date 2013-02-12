@@ -94,7 +94,11 @@ sub deflesh {
     } elsif (blessed($data) && eval { keys %{$data}; 1; } ) {
         return $self->_blank_hash($data);
     } else {
-        die "You need to pass the deflesh method either a hash or an array reference";
+        die "You must pass the deflesh method one of:
+    HashRef
+    ArrayRef
+    Object that is a blessed HashRef
+";
     }
 }
 
