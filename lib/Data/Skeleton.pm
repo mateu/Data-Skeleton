@@ -197,20 +197,6 @@ sub _blank_array {
 
 1;
 
-=head1 SEE ALSO
-
-Data::Dump::Partial is way more feature rich than this module.
-The only reason I didn't use it is that the output is all on one line.
-To get something similar to deflesh with Data::Dump::Partial do:
-
-    say Dumper dump_partial($data, {max_total_len => $big_enough_number, max_len => 0});
-
-The important part being max_len = 0
-
-This module was inspired when I wanted to see the "schema" of a MongoDB document.
-If you want to enforce a schema (and have a place to recall its nature)
-then you might consider L<Data::Schema>
-
 =head1 AUTHORS
 
 Mateu Hunter C<hunter@missoula.org>

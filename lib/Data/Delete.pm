@@ -51,15 +51,28 @@ values from a data structure that involves HashRef.  This modules does that.
 
 =cut
 
+
 has 'references_seen' => (
     is  => 'rw',
     isa => HashRef,
 );
 
+=head2 debug_delete
+
+Turn on/off debugging
+
+=cut
+
 has 'debug_delete' => (
     is  => 'ro',
     isa => Bool,
 );
+
+=head2 debug_delete
+
+Choose to remove empty string or not
+
+=cut
 
 has 'will_delete_empty_string' => (
     is      => 'lazy',
