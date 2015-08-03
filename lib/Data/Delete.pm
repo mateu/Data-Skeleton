@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+
 package Data::Delete;
 use Moo;
 use MooX::Types::MooseLike::Base qw/HashRef Bool/;
@@ -46,11 +47,10 @@ Data::Delete - Delete keys with undefined or empty string values in a deep data 
 
 =head1 DESCRIPTION
 
-Sometimes you want to remove the undefined or even empty string
-values from a data structure that involves HashRef.  This modules does that. 
+A module for when you want to remove HashRef keys when the value is undefined
+or an empty string.
 
 =cut
-
 
 has 'references_seen' => (
     is  => 'rw',
@@ -68,9 +68,9 @@ has 'debug_delete' => (
     isa => Bool,
 );
 
-=head2 debug_delete
+=head2 will_delete_empty_string
 
-Choose to remove empty string or not
+Choose to remove empty string hash values
 
 =cut
 
@@ -129,32 +129,34 @@ sub _delete_hash {
         }
         if ( not $ref_value ) {
 
-            # delete a value that is not defined
+            # Delete a key when the value is not defined
             if ( not defined $value ) {
                 delete $hashref->{$key};
             }
 
-            # optionally delete an empty string value
+            # Optionally delete an empty string value
             elsif ( not $value and length($value) == 0 ) {
                 delete $hashref->{$key} if $self->will_delete_empty_string;
             }
+
+            # Make no change
             else { }
         }
 
         # Defined and not the zero string
         elsif ( $ref_value eq 'HASH' ) {
 
-            # recurse when a value is a HashRef
+            # Recurse when a value is a HashRef
             $hashref->{$key} = $self->_delete_hash($value);
         }
 
-        # look inside ArrayRefs for HashRefs
+        # Look inside ArrayRefs for HashRefs
         elsif ( $ref_value eq 'ARRAY' ) {
             $hashref->{$key} = $self->_delete_array($value);
         }
-        else {
-            # Leave alone
-        }
+
+        # Leave alone
+        else { }
     }
     return $hashref;
 }
@@ -163,39 +165,32 @@ sub _delete_array {
     my ( $self, $arrayref ) = @_;
 
     my $references_seen = $self->references_seen;
-    my @ref_values =
-      grep { ref($_) eq 'HASH' or ref($_) eq 'ARRAY' } @{$arrayref};
+    $arrayref        = [
+        map {
+            if ( ref($_) ) {
+                if ( ref($_) eq 'HASH' ) {
+                    $self->_delete_hash($_);
+                }
+                elsif ( ref($_) eq 'ARRAY' ) {
 
-# if no array values are a reference to either a Hash or an Array then we nuke the entire array
-    if ( !scalar @ref_values ) {
-        $arrayref = $self->value_marker;
-    }
-    else {
-        $arrayref = [
-            map {
-                if ( ref($_) ) {
-                    if ( ref($_) eq 'HASH' ) {
-                        $self->_delete_hash($_);
+                    # Skip if we've seen this ref before
+                    if ( $references_seen->{$_} ) {
+                        warn "Seen referenced value: $_ before"
+                          if $self->debug_delete;
+                        $_;
                     }
-                    elsif ( ref($_) eq 'ARRAY' ) {
-
-                        # Skip if we've seen this ref before
-                        if ( $references_seen->{$_} ) {
-                            warn "Seen referenced value: $_ before"
-                              if $self->debug_delete;
-                            next;
-                        }
+                    else {
                         $references_seen->{$_} = 1;
                         $self->references_seen($references_seen);
                         $self->_delete_array($_);
-                    }
+                   }
                 }
-                else {
-                    $_;
-                }
-            } @{$arrayref}
-        ];
-    }
+            }
+            else {
+                $_;
+            }
+        } @{$arrayref}
+    ];
     return $arrayref;
 }
 
