@@ -135,7 +135,7 @@ sub _delete_hash {
             }
 
             # Optionally delete an empty string value
-            elsif ( not $value and length($value) == 0 ) {
+            elsif ( length($value) == 0 ) {
                 delete $hashref->{$key} if $self->will_delete_empty_string;
             }
 

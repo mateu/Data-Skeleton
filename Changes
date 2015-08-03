@@ -1,4 +1,5 @@
 {{$NEXT}}
+          - Remove un-needed portion of conditional (thanks rafl)
 
 0.05      2015-08-03 12:34:15-06:00 America/Denver
           - Improve POD
