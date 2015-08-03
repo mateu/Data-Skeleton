@@ -1,5 +1,5 @@
-use strictures 1;
-
+use strict;
+use warnings;
 package Data::Delete;
 use Moo;
 use MooX::Types::MooseLike::Base qw/HashRef Bool/;

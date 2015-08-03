@@ -1,9 +1,9 @@
-use strictures 1;
+use strict;
+use warnings;
 package Data::Skeleton;
 use Moo;
 use MooX::Types::MooseLike::Base qw/Str HashRef Bool/;
 use Scalar::Util qw(blessed);
-use Data::Dumper::Concise;
 
 =head1 NAME
 
