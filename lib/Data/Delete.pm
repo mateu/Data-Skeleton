@@ -27,7 +27,7 @@ Data::Delete - Delete keys with undefined or empty string values in a deep data 
             },
         ],
     };
-    use Data::Dumper::Concise;
+    use Data::Dumper;
     print Dumper $dd->delete($deep_data_structure);
 
 # results in:
