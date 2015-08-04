@@ -166,9 +166,9 @@ sub _blank_array {
     my $references_seen = $self->references_seen;
     my @ref_values =
       grep { ref($_) eq 'HASH' or ref($_) eq 'ARRAY' } @{$arrayref};
-    # if no array values are a reference to either a Hash or an Array then we nuke the entire array
+    # if no array values are a reference to either a HASH or an ARRAY then we return an empty array reference
     if (!scalar @ref_values) {
-        $arrayref = $self->value_marker;
+        $arrayref = [];
     }
     else {
         $arrayref = [

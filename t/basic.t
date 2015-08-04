@@ -20,13 +20,16 @@ my $page = {
     scalar_ref => \'string',
     io => IO::Handle->new,
     cgi => CGI->new,
+    tags => [ qw/ poma pomme manzana / ],
 };
 
-is(ref($page), 'HASH', 'data is a hashref');
+is(ref($page), 'HASH', 'Data is a hashref');
 
 my $skeletonizer = Data::Skeleton->new;
 my $skeleton = $skeletonizer->deflesh($page);
-is_deeply([sort keys %{$skeleton}], [sort qw/fruit pie people array scalar_ref io cgi/], 'First Level Keys');
+is_deeply([sort keys %{$skeleton}], [sort qw/fruit pie people array scalar_ref io cgi tags/], 'First Level Keys');
+is_deeply($skeleton->{tags}, [], 'Array is emptied');
+ok(scalar keys %{$skeleton->{people}{parents}[1]}, 'Retained hash entry');
 
 my $object = bless {code => sub {1}}, 'TestMe';
 $skeleton = $skeletonizer->deflesh($object);
