@@ -1,5 +1,7 @@
 {{$NEXT}}
 
+         - Add will_delete_empty_ref (thanks ZARQUON)
+
 0.06      2015-08-04 12:44:57-06:00 America/Denver
           - Replace with an empty array reference instead of an empty string
             in the case of an array with no HASH or ARRAY values (thanks steveb)
